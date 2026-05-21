@@ -465,15 +465,15 @@
     // 3. Copy the config object here.
     // 4. Create a Realtime Database.
     const firebaseConfig = {
-  apiKey: "AIzaSyAgcx00Yv5qRjll3JkvPq-0MWiuuecZHuk",
-  authDomain: "ten-card-flips.firebaseapp.com",
-  databaseURL: "https://ten-card-flips-default-rtdb.firebaseio.com",
-  projectId: "ten-card-flips",
-  storageBucket: "ten-card-flips.firebasestorage.app",
-  messagingSenderId: "96389180424",
-  appId: "1:96389180424:web:26c65af3862be153cb35bd",
-  measurementId: "G-GRF5YEEZM1"
-};
+      apiKey: "AIzaSyAgcx00Yv5qRjll3JkvPq-0MWiuuecZHuk",
+      authDomain: "ten-card-flips.firebaseapp.com",
+      databaseURL: "PASTE_YOUR_REALTIME_DATABASE_URL_HERE",
+      projectId: "ten-card-flips",
+      storageBucket: "ten-card-flips.firebasestorage.app",
+      messagingSenderId: "96389180424",
+      appId: "1:96389180424:web:26c65af3862be153cb35bd",
+      measurementId: "G-GRF5YEEZM1"
+    };
 
     const RANKS = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
     const SUITS = ["♠", "♥", "♦", "♣"];
@@ -521,9 +521,15 @@
       firebaseNotice.classList.add("hidden");
     }
 
+    function showError(error) {
+      console.error(error);
+      const message = error?.message || String(error);
+      alert(`Firebase error: ${message}`);
+    }
+
     function requireFirebase() {
       if (!configured || !db) {
-        alert("Firebase is not configured yet. Replace firebaseConfig in index.html first.");
+        alert("Firebase is not configured yet. Check that firebaseConfig includes a real apiKey and a real databaseURL.");
         return false;
       }
       return true;
@@ -570,37 +576,42 @@
     }
 
     async function createRoom() {
-      if (!requireFirebase()) return;
+      try {
+        if (!requireFirebase()) return;
 
-      const name = normalizeName(el("createName").value, "Host");
-      const maxPlayers = Number(el("maxPlayers").value);
-      let code = makeRoomCode();
+        const name = normalizeName(el("createName").value, "Host");
+        const maxPlayers = Number(el("maxPlayers").value);
+        let code = makeRoomCode();
 
-      for (let tries = 0; tries < 8; tries++) {
-        const existing = await get(roomRef(code));
-        if (!existing.exists()) break;
-        code = makeRoomCode();
-      }
-
-      const room = {
-        hostId: clientId,
-        maxPlayers,
-        phase: "lobby",
-        currentFlip: 0,
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-        players: {
-          [clientId]: { id: clientId, name, seat: 1, connected: true, joinedAt: Date.now() }
+        for (let tries = 0; tries < 8; tries++) {
+          const existing = await get(roomRef(code));
+          if (!existing.exists()) break;
+          code = makeRoomCode();
         }
-      };
 
-      await set(roomRef(code), room);
-      currentRoomCode = code;
-      enterRoom(code);
+        const room = {
+          hostId: clientId,
+          maxPlayers,
+          phase: "lobby",
+          currentFlip: 0,
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+          players: {
+            [clientId]: { id: clientId, name, seat: 1, connected: true, joinedAt: Date.now() }
+          }
+        };
+
+        await set(roomRef(code), room);
+        currentRoomCode = code;
+        enterRoom(code);
+      } catch (error) {
+        showError(error);
+      }
     }
 
     async function joinRoom() {
-      if (!requireFirebase()) return;
+      try {
+        if (!requireFirebase()) return;
 
       const code = normalizeName(el("joinCode").value, "").toUpperCase();
       const name = normalizeName(el("joinName").value, "Player");
@@ -640,7 +651,10 @@
       });
 
       currentRoomCode = code;
-      enterRoom(code);
+        enterRoom(code);
+      } catch (error) {
+        showError(error);
+      }
     }
 
     function enterRoom(code) {

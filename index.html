@@ -236,11 +236,35 @@
       font-size: 0.88rem;
     }
 
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(5, minmax(38px, 1fr));
-      gap: 8px;
-      min-height: 112px;
+$1
+    .current-best {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .current-best-title {
+      color: var(--muted);
+      font-size: 0.86rem;
+      margin-bottom: 8px;
+    }
+
+    .current-best-name {
+      color: var(--accent);
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+
+    .mini-hand {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .mini-hand .playing-card,
+    .best-hand .playing-card {
+      width: 42px;
+      flex: 0 0 42px;
     }
 
     .playing-card {
@@ -381,7 +405,7 @@
       <div class="status-bar">
         <div>
           <div class="status-main" id="statusMain">Choose players and start the game.</div>
-          <div class="status-sub" id="statusSub">After starting, press “Flip Next Card” to reveal cards one cycle at a time.</div>
+          <div class="status-sub" id="statusSub">After starting, press “Flip Next Card” to reveal cards one cycle at a time. Current best hands appear after each player has at least five revealed cards.</div>
         </div>
 
         <div class="progress-wrap">
@@ -589,8 +613,38 @@
           }
         }
 
+        const currentBest = document.createElement("div");
+        currentBest.className = "current-best";
+
+        const currentTitle = document.createElement("div");
+        currentTitle.className = "current-best-title";
+        currentTitle.textContent = "Current best hand";
+        currentBest.appendChild(currentTitle);
+
+        if (shown.length >= 5) {
+          const best = bestHandFromTen(shown);
+
+          const currentName = document.createElement("div");
+          currentName.className = "current-best-name";
+          currentName.textContent = formatScore(best.score);
+          currentBest.appendChild(currentName);
+
+          const miniHand = document.createElement("div");
+          miniHand.className = "mini-hand";
+          for (const c of sortCards(best.hand)) {
+            miniHand.appendChild(cardElement(c));
+          }
+          currentBest.appendChild(miniHand);
+        } else {
+          const waiting = document.createElement("div");
+          waiting.className = "current-best-title";
+          waiting.textContent = `Waiting for ${5 - shown.length} more card${5 - shown.length === 1 ? "" : "s"}`;
+          currentBest.appendChild(waiting);
+        }
+
         panel.appendChild(head);
         panel.appendChild(cards);
+        panel.appendChild(currentBest);
         table.appendChild(panel);
       }
     }
@@ -601,7 +655,7 @@
 
       if (!gameStarted) {
         statusMain.textContent = "Choose players and start the game.";
-        statusSub.textContent = "After starting, press “Flip Next Card” to reveal cards one cycle at a time.";
+        statusSub.textContent = "After starting, press “Flip Next Card” to reveal cards one cycle at a time. Current best hands appear after each player has at least five revealed cards.";
       } else if (currentFlip < 10) {
         statusMain.textContent = `Flip ${currentFlip + 1} is ready.`;
         statusSub.textContent = "Each click reveals one card for every player.";

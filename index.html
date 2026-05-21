@@ -236,48 +236,55 @@
       font-size: 0.88rem;
     }
 
-$1
+    .cards {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      min-height: 0;
+    }
+
     .current-best {
-      margin-top: 14px;
-      padding-top: 12px;
+      margin-top: 10px;
+      padding-top: 8px;
       border-top: 1px solid var(--border);
     }
 
     .current-best-title {
       color: var(--muted);
-      font-size: 0.86rem;
-      margin-bottom: 8px;
+      font-size: 0.72rem;
+      margin-bottom: 5px;
     }
 
     .current-best-name {
       color: var(--accent);
       font-weight: 900;
-      margin-bottom: 8px;
+      font-size: 0.78rem;
+      margin-bottom: 5px;
     }
 
-    .mini-hand {
+    .mini-hand,
+    .best-hand {
       display: flex;
       flex-wrap: wrap;
-      gap: 7px;
-    }
-
-    .mini-hand .playing-card {
-      width: 34px;
-      flex: 0 0 34px;
-      font-size: 0.78rem;
-      border-radius: 8px;
+      gap: 6px;
+      align-items: center;
     }
 
     .playing-card {
-      aspect-ratio: 2.5 / 3.5;
-      border-radius: 10px;
+      width: 28px;
+      height: 38px;
+      flex: 0 0 28px;
+      border-radius: 6px;
       background: #f8fafc;
       color: #111827;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
       font-weight: 900;
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
+      font-size: 0.72rem;
+      line-height: 1;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
       border: 1px solid rgba(0, 0, 0, 0.1);
       animation: pop 0.18s ease;
       user-select: none;

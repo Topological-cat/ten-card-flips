@@ -366,10 +366,6 @@
       <div class="badge">GitHub Pages + Firebase</div>
     </header>
 
-    <section class="notice" id="firebaseNotice">
-      <strong>Firebase setup needed:</strong> replace the <code>firebaseConfig</code> object in this file with your own Firebase web app config, then enable Realtime Database. Until then, online rooms will not work.
-    </section>
-
     <section class="setup-grid panel" id="setupPanel">
       <div>
         <h2>Create Room</h2>
@@ -464,15 +460,15 @@
     // 2. Create a project and a Web App.
     // 3. Copy the config object here.
     // 4. Create a Realtime Database.
-    const firebaseConfig = {
-      apiKey: "PASTE_FIREBASE_API_KEY",
-      authDomain: "PASTE_PROJECT_ID.firebaseapp.com",
-      databaseURL: "https://PASTE_PROJECT_ID-default-rtdb.firebaseio.com",
-      projectId: "PASTE_PROJECT_ID",
-      storageBucket: "PASTE_PROJECT_ID.appspot.com",
-      messagingSenderId: "PASTE_SENDER_ID",
-      appId: "PASTE_FIREBASE_APP_ID"
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyAgcx00Yv5qRjll3JkvPq-0MWiuuecZHuk",
+    authDomain: "ten-card-flips.firebaseapp.com",
+    projectId: "ten-card-flips",
+    storageBucket: "ten-card-flips.firebasestorage.app",
+    messagingSenderId: "96389180424",
+    appId: "1:96389180424:web:26c65af3862be153cb35bd",
+    measurementId: "G-GRF5YEEZM1"
+  };
 
     const RANKS = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
     const SUITS = ["♠", "♥", "♦", "♣"];

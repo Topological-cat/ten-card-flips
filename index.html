@@ -754,31 +754,48 @@
       return compareScores(bestHandFromCards(activeShown).score, bestHandFromCards(targetShown).score) > 0;
     }
 
+    function everyoneHasTen(room) {
+      const players = getPlayers(room);
+      return players.length > 0 && players.every(p => getShown(room, p.id).length >= 10);
+    }
+
+    function targetIndexFor(players, activeIndex) {
+      return (activeIndex - 1 + players.length) % players.length;
+    }
+
     function normalizeChaseState(room, startIndex) {
       const players = getPlayers(room);
-      let index = Math.max(1, startIndex);
+      if (!players.length || everyoneHasTen(room)) {
+        return {
+          phase: "finished",
+          chaseIndex: 0,
+          activePlayerId: null,
+          targetPlayerId: null
+        };
+      }
 
-      while (index < players.length) {
-        const activeId = players[index].id;
-        const targetId = players[index - 1].id;
-        const activeShown = getShown(room, activeId);
+      let index = ((Number(startIndex) % players.length) + players.length) % players.length;
 
-        if (isAhead(room, activeId, targetId) || activeShown.length >= 10) {
-          index++;
-          continue;
+      for (let checked = 0; checked < players.length; checked++) {
+        const active = players[index];
+        const activeShown = getShown(room, active.id);
+
+        if (activeShown.length < 10) {
+          const target = players[targetIndexFor(players, index)];
+          return {
+            phase: "chase",
+            chaseIndex: index,
+            activePlayerId: active.id,
+            targetPlayerId: target.id
+          };
         }
 
-        return {
-          phase: "chase",
-          chaseIndex: index,
-          activePlayerId: activeId,
-          targetPlayerId: targetId
-        };
+        index = (index + 1) % players.length;
       }
 
       return {
         phase: "finished",
-        chaseIndex: players.length,
+        chaseIndex: 0,
         activePlayerId: null,
         targetPlayerId: null
       };
@@ -1086,16 +1103,18 @@
         updates.activePlayerId = chase.activePlayerId;
         updates.targetPlayerId = chase.targetPlayerId;
 
-        if (activeNowAhead) {
+        if (activeNowAhead && activeOutOfCards) {
+          updates.lastAction = `${getPlayerName(activeId, room)} flipped ${card.rank}${card.suit}, passed ${getPlayerName(targetId, room)}, and reached 10 cards.`;
+        } else if (activeNowAhead) {
           updates.lastAction = `${getPlayerName(activeId, room)} flipped ${card.rank}${card.suit} and passed ${getPlayerName(targetId, room)}.`;
         } else {
-          updates.lastAction = `${getPlayerName(activeId, room)} flipped ${card.rank}${card.suit} but did not pass ${getPlayerName(targetId, room)}.`;
+          updates.lastAction = `${getPlayerName(activeId, room)} flipped ${card.rank}${card.suit} but did not pass ${getPlayerName(targetId, room)} and reached 10 cards.`;
         }
 
         if (chase.phase === "chase") {
           updates.lastAction += ` ${getPlayerName(chase.activePlayerId, room)} now tries to beat ${getPlayerName(chase.targetPlayerId, room)}.`;
         } else {
-          updates.lastAction += " The chase is complete.";
+          updates.lastAction += " Everyone has revealed all 10 cards. The chase is complete.";
         }
       }
 
@@ -1228,10 +1247,10 @@
         const activeName = getPlayerName(activeId);
         const targetName = getPlayerName(targetId);
         statusMain.textContent = `${activeName}'s chase turn.`;
-        statusSub.textContent = `${activeName} flips until ahead of ${targetName}, or until all 10 cards are revealed.`;
+        statusSub.textContent = `${activeName} flips until ahead of ${targetName}, or until they reach 10 cards. The turn then moves on, and the game continues until every player has 10 cards.`;
       } else {
-        statusMain.textContent = "The chase is complete.";
-        statusSub.textContent = "Final winner is determined by comparing all revealed best hands.";
+        statusMain.textContent = "All players have revealed 10 cards.";
+        statusSub.textContent = "Final winner is determined by comparing everyone’s best five-card hand.";
       }
 
       if (currentRoom.lastAction) {

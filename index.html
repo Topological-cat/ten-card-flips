@@ -15,6 +15,8 @@
       --accent-soft: rgba(250, 204, 21, 0.12);
       --danger: #ef4444;
       --green: #22c55e;
+      --blue: #60a5fa;
+      --purple: #c084fc;
       --border: rgba(255, 255, 255, 0.12);
       --shadow: rgba(0, 0, 0, 0.35);
     }
@@ -54,13 +56,8 @@
     }
 
     h2, h3 { margin: 0 0 12px; letter-spacing: -0.03em; }
-
     p { color: var(--muted); line-height: 1.55; }
-
-    .subtitle {
-      margin: 12px 0 0;
-      max-width: 780px;
-    }
+    .subtitle { margin: 12px 0 0; max-width: 820px; }
 
     .badge {
       border: 1px solid var(--border);
@@ -200,6 +197,8 @@
     }
 
     .pill.host { color: var(--accent); background: var(--accent-soft); }
+    .pill.turn { color: var(--blue); background: rgba(96, 165, 250, 0.12); border-color: rgba(96, 165, 250, 0.45); }
+    .pill.target { color: var(--purple); background: rgba(192, 132, 252, 0.12); border-color: rgba(192, 132, 252, 0.45); }
 
     .status-bar {
       display: flex;
@@ -251,8 +250,21 @@
     }
 
     .player-card.me {
-      border-color: rgba(34, 197, 94, 0.55);
-      background: linear-gradient(180deg, rgba(34, 197, 94, 0.10), rgba(17, 24, 39, 0.78));
+      border-color: rgba(255, 255, 255, 0.28);
+    }
+
+    .player-card.active-turn {
+      border-color: rgba(96, 165, 250, 0.82);
+      background: linear-gradient(180deg, rgba(96, 165, 250, 0.16), rgba(17, 24, 39, 0.78));
+    }
+
+    .player-card.target {
+      border-color: rgba(192, 132, 252, 0.72);
+      background: linear-gradient(180deg, rgba(192, 132, 252, 0.12), rgba(17, 24, 39, 0.78));
+    }
+
+    .player-card.finished-player {
+      opacity: 0.86;
     }
 
     .player-head {
@@ -265,6 +277,28 @@
 
     .player-name { font-weight: 950; font-size: 1rem; }
     .card-count { color: var(--muted); font-size: 0.82rem; }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin: -3px 0 9px;
+    }
+
+    .tag {
+      font-size: 0.68rem;
+      font-weight: 850;
+      letter-spacing: 0.02em;
+      border-radius: 999px;
+      padding: 3px 6px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    .tag.you-tag { color: var(--accent); border-color: rgba(250, 204, 21, 0.45); background: rgba(250, 204, 21, 0.1); }
+    .tag.turn-tag { color: var(--blue); border-color: rgba(96, 165, 250, 0.45); background: rgba(96, 165, 250, 0.1); }
+    .tag.target-tag { color: var(--purple); border-color: rgba(192, 132, 252, 0.45); background: rgba(192, 132, 252, 0.1); }
+    .tag.done-tag { color: var(--green); border-color: rgba(34, 197, 94, 0.45); background: rgba(34, 197, 94, 0.1); }
 
     .cards, .mini-hand, .best-hand {
       display: flex;
@@ -326,6 +360,13 @@
       margin-bottom: 5px;
     }
 
+    .comparison-line {
+      color: var(--muted);
+      font-size: 0.78rem;
+      margin-top: 8px;
+      line-height: 1.45;
+    }
+
     .results { display: none; }
 
     .result-grid {
@@ -350,6 +391,97 @@
     .hand-type { color: var(--accent); font-weight: 950; margin: 7px 0; }
     .small-label { color: var(--muted); font-size: 0.78rem; margin: 11px 0 6px; }
 
+    .flip-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.82);
+      backdrop-filter: blur(7px);
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .flip-modal {
+      width: min(520px, 100%);
+      text-align: center;
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 28px 22px;
+      background: radial-gradient(circle at top, rgba(250, 204, 21, 0.16), rgba(17, 24, 39, 0.96) 55%);
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+    }
+
+    .flip-title {
+      font-size: 1.4rem;
+      font-weight: 950;
+      margin-bottom: 6px;
+    }
+
+    .flip-subtitle {
+      color: var(--muted);
+      margin-bottom: 22px;
+      line-height: 1.45;
+    }
+
+    .zoom-card {
+      width: 150px;
+      height: 210px;
+      margin: 0 auto 22px;
+      perspective: 1000px;
+    }
+
+    .zoom-card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      animation: slowReveal 1.65s ease-in-out forwards;
+    }
+
+    .zoom-card-face {
+      position: absolute;
+      inset: 0;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backface-visibility: hidden;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.46);
+      border: 2px solid rgba(255, 255, 255, 0.45);
+      font-weight: 950;
+      font-size: 2.2rem;
+    }
+
+    .zoom-card-back {
+      color: rgba(255, 255, 255, 0.88);
+      background:
+        linear-gradient(135deg, rgba(96, 165, 250, 0.85), rgba(30, 64, 175, 0.95)),
+        repeating-linear-gradient(45deg, rgba(255,255,255,0.16) 0 8px, transparent 8px 16px);
+    }
+
+    .zoom-card-front {
+      background: #f8fafc;
+      color: #111827;
+      transform: rotateY(180deg);
+    }
+
+    .zoom-card-front.red { color: var(--danger); }
+
+    @keyframes slowReveal {
+      0% { transform: rotateY(0deg) scale(0.92); }
+      35% { transform: rotateY(55deg) scale(1.08); }
+      70% { transform: rotateY(135deg) scale(1.12); }
+      100% { transform: rotateY(180deg) scale(1); }
+    }
+
+    .flip-outcome {
+      min-height: 1.5rem;
+      color: var(--accent);
+      font-weight: 900;
+    }
+
     @media (max-width: 820px) {
       header, .status-bar { align-items: flex-start; flex-direction: column; }
       .room-bar { grid-template-columns: 1fr; }
@@ -361,13 +493,13 @@
     <header>
       <div>
         <h1>Ten Card Flips</h1>
-        <p class="subtitle">Multiplayer version: create a room, let other users join, and every flip updates on everyone’s screen in real time.</p>
+        <p class="subtitle">Multiplayer sequential chase mode: players reveal the opening five one by one, then each challenger flips only for themselves until they beat the previous player or run out of cards.</p>
       </div>
-      <div class="badge">GitHub Pages + Firebase</div>
+      <div class="badge">Sequential Chase Mode</div>
     </header>
 
     <section class="notice" id="firebaseNotice">
-      <strong>Firebase setup needed:</strong> replace the <code>firebaseConfig</code> object in this file with your own Firebase web app config, then enable Realtime Database. Until then, online rooms will not work.
+      <strong>Firebase setup needed:</strong> replace the <code>firebaseConfig</code> object in this file with your own Firebase web app config and enable Realtime Database.
     </section>
 
     <section class="setup-grid panel" id="setupPanel">
@@ -414,7 +546,7 @@
 
         <div>
           <h3 id="roleText">Room</h3>
-          <div class="muted small" id="hostHint">The host controls Start and Flip.</div>
+          <div class="muted small" id="hostHint">The host starts the game. After that, only the active player may flip.</div>
           <div class="controls">
             <button id="copyLinkBtn" class="secondary">Copy Room Link</button>
             <button id="startGameBtn">Start Game</button>
@@ -428,21 +560,21 @@
       <div class="status-bar">
         <div>
           <div class="status-main" id="statusMain">Waiting in lobby.</div>
-          <div class="status-sub" id="statusSub">Players will see the same flips at the same time.</div>
+          <div class="status-sub" id="statusSub">The active player flips one card. Everyone sees the same update in real time.</div>
         </div>
 
         <div class="progress-wrap">
           <div class="progress-label">
-            <span>Progress</span>
-            <span id="progressText">0 / 10 flips</span>
+            <span>Cards revealed</span>
+            <span id="progressText">0 / 0</span>
           </div>
           <div class="progress"><div class="progress-fill" id="progressFill"></div></div>
         </div>
       </div>
 
       <div class="controls" style="margin-top: 0; margin-bottom: 16px;">
-        <button id="flipBtn" disabled>Flip Next Card</button>
-        <button class="secondary" id="autoBtn" disabled>Auto Flip All</button>
+        <button id="flipBtn" disabled>Flip My Card</button>
+        <button class="secondary" id="autoBtn" disabled>Auto Flip My Turn</button>
         <button class="secondary" id="newRoundBtn" disabled>Back to Lobby</button>
       </div>
 
@@ -456,14 +588,24 @@
     </section>
   </main>
 
+  <section class="flip-overlay hidden" id="flipOverlay">
+    <div class="flip-modal">
+      <div class="flip-title" id="flipTitle">Final chase card</div>
+      <div class="flip-subtitle" id="flipSubtitle">The card is being revealed...</div>
+      <div class="zoom-card">
+        <div class="zoom-card-inner" id="zoomCardInner">
+          <div class="zoom-card-face zoom-card-back">◆</div>
+          <div class="zoom-card-face zoom-card-front" id="zoomCardFront">A♠</div>
+        </div>
+      </div>
+      <div class="flip-outcome" id="flipOutcome">Slow reveal...</div>
+    </div>
+  </section>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
     import { getDatabase, ref, set, get, update, onValue, remove, onDisconnect } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-database.js";
 
-    // 1. Go to Firebase Console.
-    // 2. Create a project and a Web App.
-    // 3. Copy the config object here.
-    // 4. Create a Realtime Database.
     const firebaseConfig = {
       apiKey: "AIzaSyAgcx00Yv5qRjll3JkvPq-0MWiuuecZHuk",
       authDomain: "ten-card-flips.firebaseapp.com",
@@ -500,12 +642,19 @@
     const table = el("table");
     const winnerLine = el("winnerLine");
     const resultGrid = el("resultGrid");
+    const flipOverlay = el("flipOverlay");
+    const flipTitle = el("flipTitle");
+    const flipSubtitle = el("flipSubtitle");
+    const zoomCardFront = el("zoomCardFront");
+    const zoomCardInner = el("zoomCardInner");
+    const flipOutcome = el("flipOutcome");
 
     let db = null;
     let currentRoomCode = null;
     let currentRoom = null;
     let unsubscribeRoom = null;
     let autoRunning = false;
+    const shownAnimationIds = new Set();
 
     const configured = firebaseConfig.apiKey && !firebaseConfig.apiKey.includes("PASTE_") && firebaseConfig.databaseURL && !firebaseConfig.databaseURL.includes("PASTE_");
 
@@ -571,8 +720,68 @@
       return Object.values(room.players).sort((a, b) => (a.seat ?? 99) - (b.seat ?? 99));
     }
 
+    function getPlayerName(id, room = currentRoom) {
+      return room?.players?.[id]?.name || "Player";
+    }
+
     function isHost(room = currentRoom) {
       return room && room.hostId === clientId;
+    }
+
+    function getShown(room, playerId) {
+      const data = room?.revealed?.[playerId];
+      if (!data) return [];
+      if (Array.isArray(data)) return data.filter(Boolean);
+      return Object.keys(data).sort((a, b) => Number(a) - Number(b)).map(k => data[k]).filter(Boolean);
+    }
+
+    function totalRevealed(room = currentRoom) {
+      return getPlayers(room).reduce((sum, p) => sum + getShown(room, p.id).length, 0);
+    }
+
+    function cloneRoom(room) {
+      return JSON.parse(JSON.stringify(room));
+    }
+
+    function isRed(card) {
+      return card?.suit === "♥" || card?.suit === "♦";
+    }
+
+    function isAhead(room, activeId, targetId) {
+      const activeShown = getShown(room, activeId);
+      const targetShown = getShown(room, targetId);
+      if (activeShown.length < 5 || targetShown.length < 5) return false;
+      return compareScores(bestHandFromCards(activeShown).score, bestHandFromCards(targetShown).score) > 0;
+    }
+
+    function normalizeChaseState(room, startIndex) {
+      const players = getPlayers(room);
+      let index = Math.max(1, startIndex);
+
+      while (index < players.length) {
+        const activeId = players[index].id;
+        const targetId = players[index - 1].id;
+        const activeShown = getShown(room, activeId);
+
+        if (isAhead(room, activeId, targetId) || activeShown.length >= 10) {
+          index++;
+          continue;
+        }
+
+        return {
+          phase: "chase",
+          chaseIndex: index,
+          activePlayerId: activeId,
+          targetPlayerId: targetId
+        };
+      }
+
+      return {
+        phase: "finished",
+        chaseIndex: players.length,
+        activePlayerId: null,
+        targetPlayerId: null
+      };
     }
 
     async function createRoom() {
@@ -593,7 +802,6 @@
           hostId: clientId,
           maxPlayers,
           phase: "lobby",
-          currentFlip: 0,
           createdAt: Date.now(),
           updatedAt: Date.now(),
           players: {
@@ -613,44 +821,42 @@
       try {
         if (!requireFirebase()) return;
 
-      const code = normalizeName(el("joinCode").value, "").toUpperCase();
-      const name = normalizeName(el("joinName").value, "Player");
-      if (!code) {
-        alert("Enter a room code first.");
-        return;
-      }
+        const code = normalizeName(el("joinCode").value, "").toUpperCase();
+        const name = normalizeName(el("joinName").value, "Player");
+        if (!code) {
+          alert("Enter a room code first.");
+          return;
+        }
 
-      const snapshot = await get(roomRef(code));
-      if (!snapshot.exists()) {
-        alert("Room not found.");
-        return;
-      }
+        const snapshot = await get(roomRef(code));
+        if (!snapshot.exists()) {
+          alert("Room not found.");
+          return;
+        }
 
-      const room = snapshot.val();
-      if (room.phase !== "lobby" && !room.players?.[clientId]) {
-        alert("This game already started. Ask the host to return to lobby for a new round.");
-        return;
-      }
+        const room = snapshot.val();
+        if (room.phase !== "lobby" && !room.players?.[clientId]) {
+          alert("This game already started. Ask the host to return to lobby for a new round.");
+          return;
+        }
 
-      const players = getPlayers(room);
-      const alreadyInRoom = room.players?.[clientId];
-      if (!alreadyInRoom && players.length >= Number(room.maxPlayers || 5)) {
-        alert("This room is full.");
-        return;
-      }
+        const players = getPlayers(room);
+        const alreadyInRoom = room.players?.[clientId];
+        if (!alreadyInRoom && players.length >= Number(room.maxPlayers || 5)) {
+          alert("This room is full.");
+          return;
+        }
 
-      const usedSeats = new Set(players.map(p => p.seat));
-      let seat = alreadyInRoom?.seat || 1;
-      if (!alreadyInRoom) {
-        while (usedSeats.has(seat)) seat++;
-      }
+        const usedSeats = new Set(players.map(p => p.seat));
+        let seat = alreadyInRoom?.seat || 1;
+        if (!alreadyInRoom) while (usedSeats.has(seat)) seat++;
 
-      await update(roomRef(code), {
-        [`players/${clientId}`]: { id: clientId, name, seat, connected: true, joinedAt: Date.now() },
-        updatedAt: Date.now()
-      });
+        await update(roomRef(code), {
+          [`players/${clientId}`]: { id: clientId, name, seat, connected: true, joinedAt: Date.now() },
+          updatedAt: Date.now()
+        });
 
-      currentRoomCode = code;
+        currentRoomCode = code;
         enterRoom(code);
       } catch (error) {
         showError(error);
@@ -683,77 +889,240 @@
 
     async function leaveRoom() {
       if (!currentRoomCode || !db) return;
-
       const room = currentRoom;
       const hostLeaving = isHost(room);
       await remove(ref(db, `rooms/${currentRoomCode}/players/${clientId}`));
-
-      if (hostLeaving) {
-        await remove(roomRef(currentRoomCode));
-      }
-
+      if (hostLeaving) await remove(roomRef(currentRoomCode));
       location.href = location.pathname;
     }
 
     async function startGame() {
-      if (!currentRoom || !isHost()) return;
+      try {
+        if (!currentRoom || !isHost()) return;
 
-      const players = getPlayers();
-      if (players.length < 2) {
-        alert("At least 2 players are needed to start.");
-        return;
-      }
-
-      const deck = shuffle(createDeck());
-      const hands = {};
-      const revealed = {};
-
-      for (const p of players) {
-        hands[p.id] = [];
-        revealed[p.id] = [];
-      }
-
-      for (let i = 0; i < 10; i++) {
-        for (const p of players) {
-          hands[p.id].push(deck.pop());
+        const players = getPlayers();
+        if (players.length < 2) {
+          alert("At least 2 players are needed to start.");
+          return;
         }
-      }
 
-      await update(roomRef(), {
-        phase: "playing",
-        currentFlip: 0,
-        hands,
-        revealed,
-        updatedAt: Date.now()
-      });
+        const deck = shuffle(createDeck());
+        const hands = {};
+        const revealed = {};
+
+        for (const p of players) {
+          hands[p.id] = [];
+          revealed[p.id] = {};
+        }
+
+        for (let i = 0; i < 10; i++) {
+          for (const p of players) hands[p.id].push(deck.pop());
+        }
+
+        await update(roomRef(), {
+          phase: "opening",
+          hands,
+          revealed,
+          openingRound: 0,
+          openingIndex: 0,
+          chaseIndex: null,
+          activePlayerId: players[0].id,
+          targetPlayerId: null,
+          animation: null,
+          lastAction: `${players[0].name} opens card 1.`,
+          updatedAt: Date.now()
+        });
+      } catch (error) {
+        showError(error);
+      }
     }
 
-    async function flipNextCard() {
-      if (!currentRoom || !isHost() || currentRoom.phase !== "playing") return;
-      const flip = Number(currentRoom.currentFlip || 0);
-      if (flip >= 10) return;
+    async function flipMyCard() {
+      try {
+        if (!currentRoom || currentRoom.animation) return;
+        if (currentRoom.activePlayerId !== clientId) {
+          alert("It is not your turn to flip.");
+          return;
+        }
 
-      const updates = { currentFlip: flip + 1, updatedAt: Date.now() };
-      const players = getPlayers();
+        if (currentRoom.phase === "opening") {
+          await flipOpeningCard();
+        } else if (currentRoom.phase === "chase") {
+          await flipChaseCard();
+        }
+      } catch (error) {
+        showError(error);
+      }
+    }
 
-      for (const p of players) {
-        const card = currentRoom.hands?.[p.id]?.[flip];
-        if (card) updates[`revealed/${p.id}/${flip}`] = card;
+    async function flipOpeningCard() {
+      const room = currentRoom;
+      const players = getPlayers(room);
+      const activeId = room.activePlayerId;
+      const openingRound = Number(room.openingRound || 0);
+      const openingIndex = Number(room.openingIndex || 0);
+      const card = room.hands?.[activeId]?.[openingRound];
+
+      if (!card) return;
+
+      const updates = {
+        [`revealed/${activeId}/${openingRound}`]: card,
+        updatedAt: Date.now()
+      };
+
+      let nextOpeningIndex = openingIndex + 1;
+      let nextOpeningRound = openingRound;
+      let nextActiveId = null;
+
+      if (nextOpeningIndex < players.length) {
+        nextActiveId = players[nextOpeningIndex].id;
+        updates.phase = "opening";
+        updates.openingIndex = nextOpeningIndex;
+        updates.openingRound = nextOpeningRound;
+        updates.activePlayerId = nextActiveId;
+        updates.targetPlayerId = null;
+        updates.lastAction = `${getPlayerName(activeId, room)} flipped ${card.rank}${card.suit}. ${getPlayerName(nextActiveId, room)} opens card ${openingRound + 1}.`;
+      } else if (openingRound + 1 < 5) {
+        nextOpeningIndex = 0;
+        nextOpeningRound = openingRound + 1;
+        nextActiveId = players[0].id;
+        updates.phase = "opening";
+        updates.openingIndex = nextOpeningIndex;
+        updates.openingRound = nextOpeningRound;
+        updates.activePlayerId = nextActiveId;
+        updates.targetPlayerId = null;
+        updates.lastAction = `${getPlayerName(activeId, room)} flipped ${card.rank}${card.suit}. ${players[0].name} opens card ${nextOpeningRound + 1}.`;
+      } else {
+        const tempRoom = cloneRoom(room);
+        if (!tempRoom.revealed) tempRoom.revealed = {};
+        if (!tempRoom.revealed[activeId]) tempRoom.revealed[activeId] = {};
+        tempRoom.revealed[activeId][openingRound] = card;
+
+        const chase = normalizeChaseState(tempRoom, 1);
+        updates.phase = chase.phase;
+        updates.openingIndex = null;
+        updates.openingRound = null;
+        updates.chaseIndex = chase.chaseIndex;
+        updates.activePlayerId = chase.activePlayerId;
+        updates.targetPlayerId = chase.targetPlayerId;
+        updates.lastAction = chase.phase === "finished"
+          ? `${getPlayerName(activeId, room)} flipped ${card.rank}${card.suit}. Opening finished and no chase is needed.`
+          : `${getPlayerName(activeId, room)} flipped ${card.rank}${card.suit}. Chase begins: ${getPlayerName(chase.activePlayerId, room)} tries to beat ${getPlayerName(chase.targetPlayerId, room)}.`;
       }
 
-      if (flip + 1 >= 10) updates.phase = "finished";
       await update(roomRef(), updates);
     }
 
-    async function autoFlipAll() {
-      if (!isHost() || autoRunning) return;
-      autoRunning = true;
-      while (currentRoom && currentRoom.phase === "playing" && Number(currentRoom.currentFlip || 0) < 10) {
-        await flipNextCard();
-        await new Promise(resolve => setTimeout(resolve, 520));
-        const fresh = await get(roomRef());
-        currentRoom = fresh.val();
+    async function flipChaseCard() {
+      const room = currentRoom;
+      const activeId = room.activePlayerId;
+      const targetId = room.targetPlayerId;
+      const chaseIndex = Number(room.chaseIndex || 1);
+      const shown = getShown(room, activeId);
+      const nextIndex = shown.length;
+
+      if (nextIndex >= 10) return;
+
+      const card = room.hands?.[activeId]?.[nextIndex];
+      if (!card) {
+        alert("No more card is available for this player.");
+        return;
       }
+
+      const isLastChaseCard = nextIndex === 9;
+
+      if (isLastChaseCard) {
+        const animationId = crypto.randomUUID();
+        await update(roomRef(), {
+          animation: {
+            id: animationId,
+            playerId: activeId,
+            targetId,
+            card,
+            title: "Final chase card",
+            subtitle: `${getPlayerName(activeId, room)} needs this card to beat ${getPlayerName(targetId, room)}.`,
+            startedAt: Date.now()
+          },
+          lastAction: `${getPlayerName(activeId, room)} is revealing the final chase card...`,
+          updatedAt: Date.now()
+        });
+
+        await new Promise(resolve => setTimeout(resolve, 1900));
+
+        const fresh = await get(roomRef());
+        const freshRoom = fresh.val();
+        if (!freshRoom || freshRoom.activePlayerId !== activeId || freshRoom.phase !== "chase") {
+          await update(roomRef(), { animation: null, updatedAt: Date.now() });
+          return;
+        }
+
+        await commitChaseReveal(freshRoom, activeId, targetId, chaseIndex, nextIndex, card, animationId);
+      } else {
+        await commitChaseReveal(room, activeId, targetId, chaseIndex, nextIndex, card, null);
+      }
+    }
+
+    async function commitChaseReveal(room, activeId, targetId, chaseIndex, nextIndex, card, animationId) {
+      const tempRoom = cloneRoom(room);
+      if (!tempRoom.revealed) tempRoom.revealed = {};
+      if (!tempRoom.revealed[activeId]) tempRoom.revealed[activeId] = {};
+      tempRoom.revealed[activeId][nextIndex] = card;
+
+      const activeNowAhead = isAhead(tempRoom, activeId, targetId);
+      const activeOutOfCards = getShown(tempRoom, activeId).length >= 10;
+
+      let updates = {
+        [`revealed/${activeId}/${nextIndex}`]: card,
+        lastAction: `${getPlayerName(activeId, room)} flipped ${card.rank}${card.suit}.`,
+        updatedAt: Date.now()
+      };
+
+      if (animationId) updates.animation = null;
+
+      if (activeNowAhead || activeOutOfCards) {
+        const chase = normalizeChaseState(tempRoom, chaseIndex + 1);
+        updates.phase = chase.phase;
+        updates.chaseIndex = chase.chaseIndex;
+        updates.activePlayerId = chase.activePlayerId;
+        updates.targetPlayerId = chase.targetPlayerId;
+
+        if (activeNowAhead) {
+          updates.lastAction = `${getPlayerName(activeId, room)} flipped ${card.rank}${card.suit} and passed ${getPlayerName(targetId, room)}.`;
+        } else {
+          updates.lastAction = `${getPlayerName(activeId, room)} flipped ${card.rank}${card.suit} but did not pass ${getPlayerName(targetId, room)}.`;
+        }
+
+        if (chase.phase === "chase") {
+          updates.lastAction += ` ${getPlayerName(chase.activePlayerId, room)} now tries to beat ${getPlayerName(chase.targetPlayerId, room)}.`;
+        } else {
+          updates.lastAction += " The chase is complete.";
+        }
+      }
+
+      await update(roomRef(), updates);
+    }
+
+    async function autoFlipMyTurn() {
+      if (autoRunning) return;
+      autoRunning = true;
+      renderRoom();
+
+      try {
+        while (
+          currentRoom &&
+          !currentRoom.animation &&
+          (currentRoom.phase === "opening" || currentRoom.phase === "chase") &&
+          currentRoom.activePlayerId === clientId
+        ) {
+          await flipMyCard();
+          await new Promise(resolve => setTimeout(resolve, 650));
+          const fresh = await get(roomRef());
+          currentRoom = fresh.val();
+        }
+      } catch (error) {
+        showError(error);
+      }
+
       autoRunning = false;
       renderRoom();
     }
@@ -762,9 +1131,15 @@
       if (!currentRoom || !isHost()) return;
       await update(roomRef(), {
         phase: "lobby",
-        currentFlip: 0,
         hands: null,
         revealed: null,
+        openingRound: null,
+        openingIndex: null,
+        chaseIndex: null,
+        activePlayerId: null,
+        targetPlayerId: null,
+        animation: null,
+        lastAction: null,
         updatedAt: Date.now()
       });
     }
@@ -775,43 +1150,92 @@
       el("roomHint").textContent = "Room link copied.";
     }
 
+    function maybeShowAnimation(room) {
+      const anim = room?.animation;
+      if (!anim || !anim.id || shownAnimationIds.has(anim.id)) return;
+
+      shownAnimationIds.add(anim.id);
+      flipTitle.textContent = anim.title || "Final chase card";
+      flipSubtitle.textContent = anim.subtitle || "The card is being revealed...";
+      zoomCardFront.textContent = `${anim.card.rank}${anim.card.suit}`;
+      zoomCardFront.classList.toggle("red", isRed(anim.card));
+      flipOutcome.textContent = "Slow reveal...";
+
+      zoomCardInner.style.animation = "none";
+      void zoomCardInner.offsetWidth;
+      zoomCardInner.style.animation = "";
+
+      flipOverlay.classList.remove("hidden");
+
+      setTimeout(() => {
+        flipOutcome.textContent = `${getPlayerName(anim.playerId)} revealed ${anim.card.rank}${anim.card.suit}.`;
+      }, 1450);
+
+      setTimeout(() => {
+        flipOverlay.classList.add("hidden");
+      }, 2300);
+    }
+
     function renderRoom() {
       if (!currentRoom) return;
+
+      maybeShowAnimation(currentRoom);
 
       const players = getPlayers();
       const host = isHost();
       const phase = currentRoom.phase || "lobby";
-      const flip = Number(currentRoom.currentFlip || 0);
+      const activeId = currentRoom.activePlayerId;
+      const targetId = currentRoom.targetPlayerId;
+      const revealedTotal = totalRevealed(currentRoom);
+      const totalCards = players.length * 10;
+      const isMyTurn = (phase === "opening" || phase === "chase") && activeId === clientId && !currentRoom.animation;
 
       roomCodeText.textContent = currentRoomCode;
       roleText.textContent = host ? "You are the host" : "You joined as player";
-      hostHint.textContent = host ? "You control Start, Flip, Auto Flip, and Back to Lobby." : "Wait for the host to start and flip cards.";
+      hostHint.textContent = host
+        ? "You start the game and can return to lobby. During play, each active player flips for themselves."
+        : "During play, wait for your turn; then flip your own cards.";
 
       lobbyPlayers.innerHTML = "";
       for (const p of players) {
         const pill = document.createElement("div");
-        pill.className = `pill ${p.id === currentRoom.hostId ? "host" : ""}`;
-        pill.textContent = `${p.name}${p.id === clientId ? " (you)" : ""}${p.id === currentRoom.hostId ? " · host" : ""}`;
+        const classes = ["pill"];
+        if (p.id === currentRoom.hostId) classes.push("host");
+        if (p.id === activeId && (phase === "opening" || phase === "chase")) classes.push("turn");
+        if (p.id === targetId && phase === "chase") classes.push("target");
+        pill.className = classes.join(" ");
+        pill.textContent = `${p.name}${p.id === clientId ? " (you)" : ""}${p.id === currentRoom.hostId ? " · host" : ""}${p.id === activeId && (phase === "opening" || phase === "chase") ? " · turn" : ""}${p.id === targetId && phase === "chase" ? " · target" : ""}`;
         lobbyPlayers.appendChild(pill);
       }
 
       el("startGameBtn").disabled = !host || phase !== "lobby" || players.length < 2;
-      el("flipBtn").disabled = !host || phase !== "playing" || flip >= 10;
-      el("autoBtn").disabled = !host || phase !== "playing" || flip >= 10 || autoRunning;
+      el("flipBtn").disabled = !isMyTurn;
+      el("autoBtn").disabled = !isMyTurn || autoRunning;
       el("newRoundBtn").disabled = !host || phase === "lobby";
 
-      progressText.textContent = `${flip} / 10 flips`;
-      progressFill.style.width = `${(flip / 10) * 100}%`;
+      progressText.textContent = `${revealedTotal} / ${totalCards}`;
+      progressFill.style.width = totalCards ? `${(revealedTotal / totalCards) * 100}%` : "0%";
 
       if (phase === "lobby") {
         statusMain.textContent = "Waiting in lobby.";
         statusSub.textContent = host ? "Start when at least two players have joined." : "Waiting for the host to start.";
-      } else if (phase === "playing") {
-        statusMain.textContent = `Flip ${flip + 1} is ready.`;
-        statusSub.textContent = host ? "Click Flip Next Card to reveal the next card for every player." : "The host will reveal the next card.";
+      } else if (phase === "opening") {
+        const activeName = getPlayerName(activeId);
+        const round = Number(currentRoom.openingRound || 0) + 1;
+        statusMain.textContent = `${activeName}'s opening flip.`;
+        statusSub.textContent = `Opening stage: card ${round} of 5. Players reveal one by one in seat order.`;
+      } else if (phase === "chase") {
+        const activeName = getPlayerName(activeId);
+        const targetName = getPlayerName(targetId);
+        statusMain.textContent = `${activeName}'s chase turn.`;
+        statusSub.textContent = `${activeName} flips until ahead of ${targetName}, or until all 10 cards are revealed.`;
       } else {
-        statusMain.textContent = "All cards revealed.";
-        statusSub.textContent = "The best five-card hand has been selected for each player.";
+        statusMain.textContent = "The chase is complete.";
+        statusSub.textContent = "Final winner is determined by comparing all revealed best hands.";
+      }
+
+      if (currentRoom.lastAction) {
+        statusSub.textContent += ` ${currentRoom.lastAction}`;
       }
 
       renderTable(players);
@@ -820,11 +1244,21 @@
 
     function renderTable(players) {
       table.innerHTML = "";
+      const activeId = currentRoom.activePlayerId;
+      const targetId = currentRoom.targetPlayerId;
 
       for (const player of players) {
-        const shown = currentRoom.revealed?.[player.id] ? Object.values(currentRoom.revealed[player.id]) : [];
+        const shown = getShown(currentRoom, player.id);
         const panel = document.createElement("div");
-        panel.className = `player-card ${player.id === clientId ? "me" : ""}`;
+        const classes = ["player-card"];
+        if (player.id === clientId) classes.push("me");
+        if (player.id === activeId && (currentRoom.phase === "opening" || currentRoom.phase === "chase")) classes.push("active-turn");
+        if (player.id === targetId && currentRoom.phase === "chase") classes.push("target");
+        if (currentRoom.phase === "chase") {
+          const playerIndex = players.findIndex(p => p.id === player.id);
+          if (playerIndex < Number(currentRoom.chaseIndex || 1) - 1) classes.push("finished-player");
+        }
+        panel.className = classes.join(" ");
 
         const head = document.createElement("div");
         head.className = "player-head";
@@ -839,6 +1273,13 @@
 
         head.appendChild(name);
         head.appendChild(count);
+
+        const tags = document.createElement("div");
+        tags.className = "tags";
+        if (player.id === clientId) tags.appendChild(tagElement("YOU", "you-tag"));
+        if (player.id === activeId && (currentRoom.phase === "opening" || currentRoom.phase === "chase")) tags.appendChild(tagElement("TURN", "turn-tag"));
+        if (player.id === targetId && currentRoom.phase === "chase") tags.appendChild(tagElement("TARGET", "target-tag"));
+        if (shown.length >= 10) tags.appendChild(tagElement("10 CARDS", "done-tag"));
 
         const cards = document.createElement("div");
         cards.className = "cards";
@@ -862,6 +1303,21 @@
           mini.className = "mini-hand";
           for (const card of sortCards(best.hand)) mini.appendChild(cardElement(card));
           currentBest.appendChild(mini);
+
+          if (player.id === activeId && currentRoom.phase === "chase" && targetId) {
+            const targetShown = getShown(currentRoom, targetId);
+            if (targetShown.length >= 5) {
+              const cmp = compareScores(best.score, bestHandFromCards(targetShown).score);
+              const line = document.createElement("div");
+              line.className = "comparison-line";
+              line.textContent = cmp > 0
+                ? `Ahead of ${getPlayerName(targetId)}.`
+                : cmp === 0
+                  ? `Tied with ${getPlayerName(targetId)}; must be strictly ahead.`
+                  : `Behind ${getPlayerName(targetId)}.`;
+              currentBest.appendChild(line);
+            }
+          }
         } else {
           const waiting = document.createElement("div");
           waiting.className = "current-best-title";
@@ -870,10 +1326,18 @@
         }
 
         panel.appendChild(head);
+        panel.appendChild(tags);
         panel.appendChild(cards);
         panel.appendChild(currentBest);
         table.appendChild(panel);
       }
+    }
+
+    function tagElement(text, className) {
+      const span = document.createElement("span");
+      span.className = `tag ${className}`;
+      span.textContent = text;
+      return span;
     }
 
     function cardElement(card, empty = false) {
@@ -884,7 +1348,7 @@
         div.textContent = "?";
         return div;
       }
-      if (card.suit === "♥" || card.suit === "♦") div.classList.add("red");
+      if (isRed(card)) div.classList.add("red");
       div.textContent = `${card.rank}${card.suit}`;
       return div;
     }
@@ -975,7 +1439,7 @@
 
     function showResults(players) {
       const results = players.map(player => {
-        const shown = currentRoom.revealed?.[player.id] ? Object.values(currentRoom.revealed[player.id]) : [];
+        const shown = getShown(currentRoom, player.id);
         const best = bestHandFromCards(shown);
         return { player, score: best.score, hand: sortCards(best.hand), allCards: sortCards(shown) };
       });
@@ -1012,7 +1476,7 @@
 
         const allLabel = document.createElement("div");
         allLabel.className = "small-label";
-        allLabel.textContent = "All ten cards";
+        allLabel.textContent = "All revealed cards";
 
         const allCards = document.createElement("div");
         allCards.className = "best-hand";
@@ -1031,8 +1495,8 @@
     el("createRoomBtn").addEventListener("click", createRoom);
     el("joinRoomBtn").addEventListener("click", joinRoom);
     el("startGameBtn").addEventListener("click", startGame);
-    el("flipBtn").addEventListener("click", flipNextCard);
-    el("autoBtn").addEventListener("click", autoFlipAll);
+    el("flipBtn").addEventListener("click", flipMyCard);
+    el("autoBtn").addEventListener("click", autoFlipMyTurn);
     el("newRoundBtn").addEventListener("click", backToLobby);
     el("copyLinkBtn").addEventListener("click", copyRoomLink);
     el("leaveRoomBtn").addEventListener("click", leaveRoom);
